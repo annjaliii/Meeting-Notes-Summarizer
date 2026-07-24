@@ -1,14 +1,15 @@
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import TranscriptInput from "./components/TranscriptInput";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Results from "./pages/Results";
 
 function App() {
   return (
-    <div className="min-h-screen bg-[#0B0A14] font-sans antialiased">
-      <Navbar />
-      <Hero />
-      <TranscriptInput />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/results" element={<Results />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

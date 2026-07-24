@@ -1,10 +1,12 @@
 // src/components/TranscriptInput.jsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FileText, Sparkles } from "lucide-react";
 
 const TranscriptInput = () => {
   const [transcript, setTranscript] = useState("");
+  const navigate = useNavigate();
 
   const wordCount = transcript.trim() === "" ? 0 : transcript.trim().split(/\s+/).length;
 
@@ -12,9 +14,13 @@ const TranscriptInput = () => {
     setTranscript(e.target.value);
   };
 
+  const handleSummarize = () => {
+    if (transcript.trim() === "") return;
+    navigate("/results");
+  };
+
   return (
     <section className="relative w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-      {/* Decorative background glow */}
       <div className="pointer-events-none absolute inset-0 flex justify-center">
         <div className="w-[600px] h-[400px] bg-indigo-600/10 blur-[120px] rounded-full" />
       </div>
@@ -27,7 +33,6 @@ const TranscriptInput = () => {
         className="relative max-w-3xl mx-auto"
       >
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-[0_0_40px_-15px_rgba(99,102,241,0.35)] p-6 sm:p-8 lg:p-10">
-          {/* Header */}
           <div className="flex items-start gap-4 mb-6">
             <div className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-indigo-500/15 border border-indigo-400/20">
               <FileText className="w-5 h-5 text-indigo-300" />
@@ -44,7 +49,6 @@ const TranscriptInput = () => {
             </div>
           </div>
 
-          {/* Textarea */}
           <div className="relative">
             <textarea
               value={transcript}
@@ -53,17 +57,15 @@ const TranscriptInput = () => {
               rows={10}
               className="w-full resize-none rounded-xl bg-[#0F0E1A] border border-white/10 focus:border-indigo-400/50 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors duration-200 p-4 sm:p-5 text-sm sm:text-base text-slate-200 placeholder:text-slate-500"
             />
-
-            {/* Word counter */}
             <div className="absolute bottom-3 right-4 text-xs text-slate-500 select-none">
               {wordCount} {wordCount === 1 ? "word" : "words"}
             </div>
           </div>
 
-          {/* Action button */}
           <div className="mt-6 flex justify-end">
             <motion.button
               type="button"
+              onClick={handleSummarize}
               disabled={transcript.trim() === ""}
               whileHover={transcript.trim() !== "" ? { scale: 1.02 } : {}}
               whileTap={transcript.trim() !== "" ? { scale: 0.98 } : {}}
