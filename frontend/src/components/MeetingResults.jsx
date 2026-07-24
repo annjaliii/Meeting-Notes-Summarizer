@@ -10,36 +10,41 @@ import {
   BarChart3,
   Target,
   ScrollText,
+  FileSearch,
+  ArrowLeft,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 const Card = ({ className = "", children }) => (
   <motion.div
     variants={itemVariants}
-    className={`rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-[0_0_30px_-18px_rgba(99,102,241,0.4)] transition-colors duration-200 hover:border-indigo-400/20 ${className}`}
+    whileHover={{ y: -3, borderColor: "rgba(129,140,248,0.3)" }}
+    transition={{ duration: 0.25, ease: "easeOut" }}
+    className={`rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-[0_0_30px_-18px_rgba(99,102,241,0.4)] ${className}`}
   >
     {children}
   </motion.div>
 );
 
 const CardHeader = ({ icon: Icon, title }) => (
-  <div className="flex items-center gap-3 mb-4">
+  <div className="flex items-center gap-3 mb-4 sm:mb-5">
     <div className="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg bg-indigo-500/15 border border-indigo-400/20">
       <Icon className="w-4 h-4 text-indigo-300" />
     </div>
-    <h3 className="text-base sm:text-lg font-semibold text-slate-50">
+    <h3 className="text-base sm:text-lg font-semibold text-slate-50 tracking-tight">
       {title}
     </h3>
   </div>
@@ -54,23 +59,57 @@ const statusStyles = {
 const StatCard = ({ icon: Icon, label, value }) => (
   <motion.div
     variants={itemVariants}
-    whileHover={{ y: -2 }}
-    className="rounded-xl border border-white/10 bg-white/[0.02] p-4 flex items-center gap-3 transition-colors duration-200 hover:border-indigo-400/20"
+    whileHover={{ y: -2, borderColor: "rgba(129,140,248,0.3)" }}
+    transition={{ duration: 0.2 }}
+    className="rounded-xl border border-white/10 bg-white/[0.02] p-4 flex items-center gap-3"
   >
     <div className="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-400/20">
       <Icon className="w-4 h-4 text-purple-300" />
     </div>
     <div>
-      <p className="text-lg font-semibold text-slate-50 leading-tight">
-        {value}
-      </p>
+      <p className="text-lg font-semibold text-slate-50 leading-tight">{value}</p>
       <p className="text-xs text-slate-500">{label}</p>
     </div>
   </motion.div>
 );
 
+const EmptyState = () => {
+  const navigate = useNavigate();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28"
+    >
+      <div className="flex flex-col items-center text-center max-w-md mx-auto">
+        <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center mb-6">
+          <FileSearch className="w-7 h-7 text-indigo-300" />
+        </div>
+        <h2 className="text-xl sm:text-2xl font-semibold text-slate-50 font-[Sora] tracking-tight">
+          No Meeting Notes Yet
+        </h2>
+        <p className="mt-3 text-sm sm:text-base text-slate-400 leading-relaxed">
+          Paste a meeting transcript and generate structured notes to see them here.
+        </p>
+        <motion.button
+          onClick={() => navigate("/")}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.96 }}
+          transition={{ duration: 0.15 }}
+          className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-6 py-3 text-sm sm:text-base font-medium text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-shadow duration-200"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </motion.button>
+      </div>
+    </motion.div>
+  );
+};
+
 const MeetingResults = ({ results }) => {
-  if (!results) return null;
+  if (!results) return <EmptyState />;
 
   const {
     summary,
@@ -81,11 +120,7 @@ const MeetingResults = ({ results }) => {
   } = results;
 
   const stats = [
-    {
-      icon: MessageSquareText,
-      label: "Discussion Points",
-      value: keyPoints.length,
-    },
+    { icon: MessageSquareText, label: "Discussion Points", value: keyPoints.length },
     { icon: ListChecks, label: "Action Items", value: actionItems.length },
     { icon: Gavel, label: "Decisions", value: decisions.length },
     { icon: CalendarClock, label: "Deadlines", value: importantDates.length },
@@ -101,14 +136,14 @@ const MeetingResults = ({ results }) => {
         variants={containerVariants}
         initial="hidden"
         animate="show"
-        className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-5"
+        className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-5 sm:space-y-6"
       >
         {/* Page title */}
-        <motion.div variants={itemVariants} className="mb-2">
+        <motion.div variants={itemVariants} className="mb-1 sm:mb-2">
           <h2 className="text-2xl sm:text-3xl font-semibold text-slate-50 font-[Sora] tracking-tight">
             Meeting Overview
           </h2>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1.5 text-sm sm:text-base text-slate-400">
             Organized notes generated from your meeting transcript.
           </p>
         </motion.div>
@@ -124,14 +159,11 @@ const MeetingResults = ({ results }) => {
         )}
 
         {/* Key Points + Decisions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
           {keyPoints.length > 0 && (
-            <Card className="p-6 sm:p-7">
-              <CardHeader
-                icon={MessageSquareText}
-                title="Key Discussion Points"
-              />
-              <ul className="space-y-2.5">
+            <Card className="p-5 sm:p-7">
+              <CardHeader icon={MessageSquareText} title="Key Discussion Points" />
+              <ul className="space-y-2.5 sm:space-y-3">
                 {keyPoints.map((point, idx) => (
                   <li
                     key={idx}
@@ -146,9 +178,9 @@ const MeetingResults = ({ results }) => {
           )}
 
           {decisions.length > 0 && (
-            <Card className="p-6 sm:p-7">
+            <Card className="p-5 sm:p-7">
               <CardHeader icon={Gavel} title="Decisions Made" />
-              <ul className="space-y-2.5">
+              <ul className="space-y-2.5 sm:space-y-3">
                 {decisions.map((decision, idx) => (
                   <li
                     key={idx}
@@ -165,7 +197,7 @@ const MeetingResults = ({ results }) => {
 
         {/* Action Items — table */}
         {actionItems.length > 0 && (
-          <Card className="p-6 sm:p-7">
+          <Card className="p-5 sm:p-7">
             <CardHeader icon={Target} title="Action Items" />
             <div className="overflow-x-auto -mx-2">
               <table className="w-full min-w-[500px] border-collapse">
@@ -190,7 +222,8 @@ const MeetingResults = ({ results }) => {
                     <motion.tr
                       key={idx}
                       variants={itemVariants}
-                      className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors duration-200"
+                      whileHover={{ backgroundColor: "rgba(255,255,255,0.02)" }}
+                      className="border-b border-white/5 last:border-0 transition-colors duration-200"
                     >
                       <td className="px-2 py-3.5 text-sm text-slate-200 font-medium">
                         {item.task}
@@ -220,14 +253,11 @@ const MeetingResults = ({ results }) => {
         )}
 
         {/* Important Dates + Statistics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
           {importantDates.length > 0 && (
-            <Card className="p-6 sm:p-7">
-              <CardHeader
-                icon={ScrollText}
-                title="Important Dates / Deadlines"
-              />
-              <ul className="space-y-2.5">
+            <Card className="p-5 sm:p-7">
+              <CardHeader icon={ScrollText} title="Important Dates / Deadlines" />
+              <ul className="space-y-2.5 sm:space-y-3">
                 {importantDates.map((date, idx) => (
                   <li
                     key={idx}
@@ -241,7 +271,7 @@ const MeetingResults = ({ results }) => {
             </Card>
           )}
 
-          <Card className="p-6 sm:p-7">
+          <Card className="p-5 sm:p-7">
             <CardHeader icon={BarChart3} title="Meeting Statistics" />
             <div className="grid grid-cols-2 gap-3">
               {stats.map((stat, idx) => (
