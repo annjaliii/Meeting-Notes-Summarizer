@@ -46,7 +46,7 @@ const CardHeader = ({ icon: Icon, title }) => (
 );
 
 const statusStyles = {
-  Done: "bg-emerald-500/10 text-emerald-300 border-emerald-400/20",
+  Completed: "bg-emerald-500/10 text-emerald-300 border-emerald-400/20",
   "In Progress": "bg-amber-500/10 text-amber-300 border-amber-400/20",
   Pending: "bg-slate-500/10 text-slate-300 border-slate-400/20",
 };
