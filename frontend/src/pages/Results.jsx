@@ -1,42 +1,14 @@
 // src/pages/Results.jsx
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Download, Copy } from "lucide-react";
+import { ArrowLeft, Download, Copy, FileSearch } from "lucide-react";
 import MeetingResults from "../components/MeetingResults";
-
-// TEMPORARY sample data — replace once backend integration is connected.
-// Set to `null` to preview the Empty State.
-const sampleResults = {
-  summary:
-    "The team discussed the upcoming product launch, frontend progress, and remaining backend issues.",
-  keyPoints: [
-    "Frontend development is nearly complete.",
-    "Backend endpoints require additional testing.",
-    "The team reviewed the launch timeline.",
-  ],
-  actionItems: [
-    {
-      task: "Complete frontend testing",
-      person: "Anjali",
-      deadline: "Friday",
-      status: "In Progress",
-    },
-    {
-      task: "Fix backend issues",
-      person: "Rahul",
-      deadline: "Friday",
-      status: "Pending",
-    },
-  ],
-  decisions: ["Product launch moved to next Monday."],
-  importantDates: [
-    "Frontend testing deadline: Friday",
-    "Product launch: Next Monday",
-  ],
-};
 
 const Results = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const results = location.state?.results ?? null;
 
   return (
     <motion.div
@@ -86,7 +58,35 @@ const Results = () => {
         </div>
       </div>
 
-      <MeetingResults results={sampleResults} />
+      {results ? (
+        <MeetingResults results={results} />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28"
+        >
+          <div className="flex flex-col items-center text-center max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center mb-6">
+              <FileSearch className="w-7 h-7 text-indigo-300" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-semibold text-slate-50 font-[Sora] tracking-tight">
+              No meeting summary available.
+            </h2>
+            <motion.button
+              onClick={() => navigate("/")}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              transition={{ duration: 0.15 }}
+              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-6 py-3 text-sm sm:text-base font-medium text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-shadow duration-200"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </motion.button>
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };

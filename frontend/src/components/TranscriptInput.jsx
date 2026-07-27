@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Sparkles, X, Clock, Lightbulb } from "lucide-react";
 import LoadingScreen from "./LoadingScreen";
+import api from "../api/api";
 
 const MIN_WORDS = 10;
 
 const TranscriptInput = () => {
   const [transcript, setTranscript] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const trimmed = transcript.trim();
@@ -26,12 +28,20 @@ const TranscriptInput = () => {
     setTranscript("");
   };
 
-  const handleSummarize = () => {
+  const handleSummarize = async () => {
     if (!isValid) return;
+
+    setError("");
     setIsLoading(true);
-    setTimeout(() => {
-      navigate("/results");
-    }, 2800);
+
+    try {
+      const response = await api.post("/summarize", { transcript });
+      navigate("/results", { state: { results: response.data } });
+    } catch (err) {
+      console.error("Failed to summarize meeting:", err);
+      setError("Something went wrong while summarizing. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -138,6 +148,20 @@ const TranscriptInput = () => {
                 accurate action items and decisions.
               </p>
             </div>
+
+            {/* Error message */}
+            <AnimatePresence>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="mt-3 text-xs sm:text-sm text-red-400"
+                >
+                  {error}
+                </motion.p>
+              )}
+            </AnimatePresence>
 
             {/* Action button */}
             <div className="mt-6 flex justify-end">
