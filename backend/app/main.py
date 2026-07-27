@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.routes.summarize import router as summarize_router
+from app.services.gemini_service import test_gemini
 
 app = FastAPI(
     title="Meeting Notes Summarizer API",
@@ -15,4 +16,11 @@ def health_check():
     return {
         "status": "success",
         "message": "Meeting Notes Summarizer API is running"
+    }
+
+
+@app.get("/test-gemini")
+def test():
+    return {
+        "response": test_gemini()
     }

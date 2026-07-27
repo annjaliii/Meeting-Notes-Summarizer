@@ -1,46 +1,47 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 
 
 class TranscriptRequest(BaseModel):
-    transcript: str
+    transcript: str = Field(
+        ...,
+        min_length=20,
+        max_length=10000,
+        description="Meeting transcript"
+    )
 
 
 @router.post("/summarize")
-def summarize_meeting(data: TranscriptRequest):
+def summarize(request: TranscriptRequest):
+
+    transcript = request.transcript.strip()
+
+    if not transcript:
+        raise HTTPException(
+            status_code=400,
+            detail="Transcript cannot be empty."
+        )
+
     return {
-        "summary": "The team discussed project progress, backend testing, and launch planning.",
+        "summary": "This is a dummy summary generated for testing.",
         "keyPoints": [
-            "Frontend development is nearly complete.",
-            "Backend APIs require final testing.",
-            "QA testing starts this week."
+            "Discussed project progress",
+            "Reviewed pending tasks",
+            "Assigned new responsibilities"
         ],
         "decisions": [
-            "Product launch moved to next Monday.",
-            "Deployment review scheduled for Tuesday."
+            "Complete backend integration by Friday",
+            "Conduct next review meeting on Monday"
         ],
         "actionItems": [
-            {
-                "owner": "Anjali",
-                "task": "Complete frontend testing",
-                "deadline": "Friday"
-            },
-            {
-                "owner": "Rahul",
-                "task": "Fix backend APIs",
-                "deadline": "Friday"
-            },
-            {
-                "owner": "Amit",
-                "task": "Review deployment",
-                "deadline": "Tuesday"
-            }
+            "Update project documentation",
+            "Implement frontend integration",
+            "Review API endpoints"
         ],
         "importantDates": [
-            "Friday",
-            "Tuesday",
-            "Next Monday"
+            "Friday - Backend Deadline",
+            "Monday - Team Review Meeting"
         ]
     }
