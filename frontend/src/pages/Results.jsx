@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Download, Copy, FileSearch } from "lucide-react";
 import MeetingResults from "../components/MeetingResults";
+import { exportMeetingPdf } from "../utils/exportPdf";
 
 const Results = () => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const Results = () => {
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.15 }}
+              onClick={() => exportMeetingPdf(results)}
               className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-2 text-xs sm:text-sm font-medium text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-shadow duration-200"
             >
               <Download className="w-3.5 h-3.5" />
