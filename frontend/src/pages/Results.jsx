@@ -1,15 +1,27 @@
 // src/pages/Results.jsx
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Download, Copy, FileSearch } from "lucide-react";
+import { ArrowLeft, Download, Copy, Check, FileSearch } from "lucide-react";
 import MeetingResults from "../components/MeetingResults";
-import { exportMeetingPdf } from "../utils/exportPdf";
+import { copyMeetingNotes } from "../utils/copyNotes";
 
 const Results = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [copied, setCopied] = useState(false);
 
   const results = location.state?.results ?? null;
+
+  const handleCopy = async () => {
+    const success = await copyMeetingNotes(results);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    }
+  };
 
   return (
     <motion.div
@@ -37,19 +49,30 @@ const Results = () => {
 
           <div className="flex items-center gap-2 shrink-0">
             <motion.button
+              onClick={handleCopy}
+              disabled={!results}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.15 }}
               className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] px-3 py-2 text-xs sm:text-sm text-slate-300 transition-colors duration-200"
             >
-              <Copy className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Copy Notes</span>
+              {copied ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="hidden sm:inline">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Copy Notes</span>
+                </>
+              )}
             </motion.button>
 
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => exportMeetingPdf(results)}
+              transition={{ duration: 0.15 }}
               className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-2 text-xs sm:text-sm font-medium text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-shadow duration-200"
             >
               <Download className="w-3.5 h-3.5" />
