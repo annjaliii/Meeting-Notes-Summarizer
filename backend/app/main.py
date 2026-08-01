@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.summarize import router as summarize_router
-from app.services.gemini_service import test_gemini
+
 
 app = FastAPI(
     title="Meeting Notes Summarizer API",
@@ -32,8 +32,3 @@ def health_check():
     }
 
 
-@app.get("/test-gemini")
-def test():
-    return {
-        "response": test_gemini()
-    }

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Sparkles, X, Clock, Lightbulb } from "lucide-react";
+import toast from "react-hot-toast";
 import LoadingScreen from "./LoadingScreen";
 import api from "../api/api";
 
@@ -29,7 +30,10 @@ const TranscriptInput = () => {
   };
 
   const handleSummarize = async () => {
-    if (!isValid) return;
+    if (!isValid) {
+      toast("Please enter at least 10 words.");
+      return;
+    }
 
     setError("");
     setIsLoading(true);
@@ -40,6 +44,7 @@ const TranscriptInput = () => {
     } catch (err) {
       console.error("Failed to summarize meeting:", err);
       setError("Something went wrong while summarizing. Please try again.");
+      toast.error("Something went wrong while summarizing.");
       setIsLoading(false);
     }
   };

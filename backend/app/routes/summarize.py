@@ -1,47 +1,49 @@
+# summarize.py
+from typing import List, Optional
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from app.services.gemini_service import (
+    summarize_meeting,
+    GeminiServiceError,
+)
 router = APIRouter()
 
 
 class TranscriptRequest(BaseModel):
-    transcript: str = Field(
-        ...,
-        min_length=20,
-        max_length=10000,
-        description="Meeting transcript"
-    )
+    transcript: str = Field(..., min_length=1, description="Raw meeting transcript text.")
 
 
-@router.post("/summarize")
+class ActionItem(BaseModel):
+    task: str
+    person: Optional[str] = None
+    deadline: Optional[str] = None
+    status: Optional[str] = None
+
+
+class SummaryResponse(BaseModel):
+    summary: str
+    keyPoints: List[str]
+    decisions: List[str]
+    actionItems: List[ActionItem]
+    importantDates: List[str]
+
+
+@router.post("/summarize", response_model=SummaryResponse)
 def summarize(request: TranscriptRequest):
+    """
+    Deliberately a synchronous `def`, not `async def`.
 
-    transcript = request.transcript.strip()
+    summarize_meeting() makes a blocking network call to Gemini. FastAPI
+    automatically runs synchronous route handlers in a threadpool, so
+    this keeps the event loop free for other requests. Declaring this as
+    `async def` while calling a blocking function inside it would stall
+    the entire server under concurrent load.
+    """
+    try:
+        result = summarize_meeting(request.transcript)
+    except GeminiServiceError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message)
 
-    if not transcript:
-        raise HTTPException(
-            status_code=400,
-            detail="Transcript cannot be empty."
-        )
-
-    return {
-        "summary": "This is a dummy summary generated for testing.",
-        "keyPoints": [
-            "Discussed project progress",
-            "Reviewed pending tasks",
-            "Assigned new responsibilities"
-        ],
-        "decisions": [
-            "Complete backend integration by Friday",
-            "Conduct next review meeting on Monday"
-        ],
-        "actionItems": [
-            "Update project documentation",
-            "Implement frontend integration",
-            "Review API endpoints"
-        ],
-        "importantDates": [
-            "Friday - Backend Deadline",
-            "Monday - Team Review Meeting"
-        ]
-    }
+    return result

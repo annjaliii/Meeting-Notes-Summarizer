@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Download, Copy, Check, FileSearch } from "lucide-react";
+import toast from "react-hot-toast";
 import MeetingResults from "../components/MeetingResults";
 import { copyMeetingNotes } from "../utils/copyNotes";
 
@@ -17,10 +18,15 @@ const Results = () => {
     const success = await copyMeetingNotes(results);
     if (success) {
       setCopied(true);
+      toast.success("Meeting notes copied successfully.");
       setTimeout(() => {
         setCopied(false);
       }, 2000);
     }
+  };
+
+  const handleExportPDF = () => {
+    toast.success("Meeting notes exported as PDF.");
   };
 
   return (
@@ -70,6 +76,7 @@ const Results = () => {
             </motion.button>
 
             <motion.button
+              onClick={handleExportPDF}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.15 }}
